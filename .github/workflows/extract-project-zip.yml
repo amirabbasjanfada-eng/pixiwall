@@ -1,0 +1,53 @@
+name: Extract project ZIP
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    if: github.event.head_commit.message != 'Extract project archive [skip zip extract]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract archive and remove ZIP
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import shutil
+
+          archive = Path("pixiwall-android.zip")
+          if not archive.exists():
+              print("Archive is already absent; nothing to do.")
+              raise SystemExit(0)
+
+          with ZipFile(archive) as z:
+              root = Path.cwd().resolve()
+              for item in z.infolist():
+                  target = (root / item.filename).resolve()
+                  if target != root and root not in target.parents:
+                      raise RuntimeError(f"Unsafe path in ZIP: {item.filename}")
+              z.extractall(root)
+
+          archive.unlink()
+          print("Extracted archive and removed original ZIP.")
+          PY
+
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Extract project archive [skip zip extract]"
+            git push
+          fi
