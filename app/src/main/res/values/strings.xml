@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">PixiWall</string>
+    <string name="wallpaper_description">Runs your PixiJS animation offline.</string>
+</resources>
