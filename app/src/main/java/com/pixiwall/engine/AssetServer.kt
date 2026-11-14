@@ -16,9 +16,9 @@ const val INDEX_URL = "https://$HOST/engine/index.html"
 
 /**
  * Answers every request the WebView makes, from inside the app:
- *   /engine/*   index.html, runtime.js, pixi.min.js   (APK assets)
- *   /builtin/preset.js                                (APK assets)
- *   /anim/<id>.js                                     (imported animations, app-private storage)
+ *   /engine/       index.html, runtime.js, pixi.min.js (APK assets)
+ *   /builtin/      preset.js (APK assets)
+ *   /anim/<id>.js  imported animations, app-private storage
  * Any other http(s) request is refused, so an imported animation cannot reach the network.
  */
 class AssetServer(private val context: Context) {
